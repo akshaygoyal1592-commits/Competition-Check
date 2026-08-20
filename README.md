@@ -37,11 +37,14 @@ Both ad libraries block server-side fetching, so these need a human with a brows
 The Play Store's displayed download bucket ("10K+", "50K+") is too coarse to show weekly movement. Use the **embedded install counter** in the page's JSON instead — it's Google's own precise number:
 
 ```bash
-curl -s "https://play.google.com/store/apps/details?id=com.cmpntech.tutor&hl=en_IN&gl=IN" \
-  | grep -o '\["[0-9,]*+",[0-9]*,[0-9]*,"[0-9A-Z+]*"\]' | head -1
-# Bloom  2026-08-20: ["10,000+",10000,30954,"10K+"]   → 30,954 installs
-# Eduro  2026-08-20: ["50,000+",50000,67841,"50K+"]   → 67,841 installs
+./scripts/snapshot.sh
 ```
+
+It appends a dated row per app to [`reports/metrics-history.csv`](reports/metrics-history.csv) and prints the week-over-week delta. The figure it records is Google's own precise counter, embedded in the Play page JSON as the third element of the installs array — e.g. `["10,000+",10000,30954,"10K+"]` → **30,954**. Baseline (2026-08-20): Bloom 30,954, Eduro 67,841.
+
+**Growth needs two snapshots.** One row gives you a lifetime average and nothing else, so run this every week even if nothing else gets done.
+
+⚠️ **Do not use review velocity as an install proxy for Bloom.** Their August 2026 review surge is substantially seeded — four identical "class 10 trigonometry" reviews on one day, a template praising the app "for science" on a maths-only product, and no 2★ or 3★ reviews at all in the month. The install counter is the only trustworthy volume metric for them. Eduro's reviews do look organic and can be read normally.
 
 Bloom's live pricing is hardcoded in their production JS (`directAmount`), so a price test is detectable without going through the funnel:
 

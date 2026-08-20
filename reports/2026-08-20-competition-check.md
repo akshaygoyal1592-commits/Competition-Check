@@ -107,7 +107,7 @@ Implied ₹26.6/class. No sibling offers, no annual plan, no coupons. Refunds: w
 - **Funding: $2.5M seed led by Peak XV's Surge** (All In Capital, DeVC, UntitledVC + angels), announced Feb–Mar 2026. **Critical context: the round was raised for "Mello", a vernacular AI-companion entertainment app. Bloom is a pivot.** The careers page still lists a Content Manager for "immersive RPG worlds", so Mello likely still runs in parallel — meaning Bloom may not have the founders' full attention or the full $2.5M.
 - **Founders:** Akshay Jhanwar (ex-CRED, BITS Pilani) and Ajit Pol (ex-Flipkart, Leap).
 - **Team:** ~8 people (Tracxn, Apr–May 2026). 4 open Bangalore roles including the Growth Marketing Manager.
-- **Install velocity:** review velocity roughly tripled in Jun–Jul 2026; AppBrain's (stale, ~June) snapshot showed ~350 installs/day. Consistent with always-on paid acquisition, not organic virality.
+- **Install velocity:** ~262 installs/day lifetime average (30,954 installs over 118 days), flat-to-slightly-declining rather than accelerating. See Addendum 2. **Note:** an earlier version of this line cited tripling review velocity as evidence of acceleration — that was withdrawn once the reviews were found to be substantially seeded.
 - **Unverified claim:** "Trusted by 50,000+ parents" — exceeds their ~31K Android installs and has no third-party validation.
 
 ### Credibility weak spots (usable competitive ammunition)
@@ -341,6 +341,82 @@ Also confirmed in the tracking stack: Meta Pixel `890261980731916` with `PageVie
 | `/pricing` | **0 hits** | `AW-17634968559` | `G-TW33E0DLM1` |
 
 Still no Meta presence of any kind. Bloom's pricing also re-checked and unchanged: `₹9` trial, `₹799/month` direct.
+
+---
+
+## Addendum 2 — Bloom's download growth rate (added 2026-08-20, after follow-up)
+
+### The honest headline
+
+**A true growth rate needs two snapshots, and only one exists.** Google's install counter was captured for the first time today. `scripts/snapshot.sh` and `reports/metrics-history.csv` now exist so the Monday run produces a real week-over-week number. Everything below is what can be derived from a single snapshot plus release dates — solid on averages, weak on trend.
+
+### Lifetime average install rate <span>● measured</span>
+
+| App | Released | Days live | Installs (Play's precise counter) | Avg/day | Avg/month |
+|---|---|---:|---:|---:|---:|
+| **Bloom** | 24 Apr 2026 | 118 | **30,954** | **262** | ~7,975 |
+| **Eduro** | 26 Nov 2025 | 267 | **67,841** | **254** | ~7,724 |
+
+The striking result: **their lifetime daily install rates are nearly identical (~250–260/day)** — but Bloom is buying its volume through Meta while Eduro's arrives through SEO, community and referrals. Same throughput, structurally different cost.
+
+### Is Bloom accelerating? Probably not <span>○ estimated</span>
+
+The only longitudinal reference point is AppBrain's stale snapshot (~14,000 downloads around 12 Jun 2026). Splitting Bloom's life at that date:
+
+| Interval | Days | Installs added | Rate |
+|---|---:|---:|---:|
+| 24 Apr → 12 Jun 2026 | 49 | ~14,000 | ~286/day |
+| 12 Jun → 20 Aug 2026 | 69 | ~16,954 | ~246/day |
+
+**≈ −14% change in run-rate — flat to slightly declining, not compounding.**
+
+Treat this loosely: AppBrain's "downloads" and Play's internal "installs" are different metrics from different methodologies, so mixing them is indicative only. But the direction is consistent with a business whose installs are bought at a steady spend rather than one whose growth is accelerating on its own.
+
+### What a steady ~250/day implies about their spend <span>○ estimated</span>
+
+If most of Bloom's installs are paid (their funnel is Meta-only, with no SEO or organic channel of any kind):
+
+| Assumed CPI | Implied monthly media spend | Per year |
+|---:|---:|---:|
+| ₹40 | ₹3.0 lakh | ₹36.5 lakh |
+| ₹60 | ₹4.6 lakh | ₹54.8 lakh |
+| ₹80 | ₹6.1 lakh | ₹73.0 lakh |
+| ₹120 | ₹9.1 lakh | ₹109.5 lakh |
+
+Against a $2.5M (~₹21 crore) seed, ₹35 lakh–1.1 crore a year is a modest, sustainable burn. **They are not spending anywhere near their means.** That matters competitively: Bloom has a great deal of unused firepower, and the constraint on their growth is unit economics, not budget.
+
+### ⚠️ Correction to the week-1 report: review velocity is not a usable proxy for Bloom
+
+The week-1 report stated that Bloom's "review velocity roughly tripled in Jun–Jul 2026, consistent with always-on paid acquisition". **Both halves of that are wrong.** Pulling all 32 of Bloom's retrievable text reviews directly from Play's reviews endpoint gives:
+
+| Month | Reviews |
+|---|---:|
+| May 2026 | 1 |
+| Jun 2026 | 2 |
+| Jul 2026 | 3 |
+| **Aug 2026 (to 19th)** | **26** |
+
+The August spike is not growth — **it is substantially manufactured.** Evidence from the review text itself:
+
+- **Four near-identical reviews on 7 Aug**, all variants of *"i was struggling with class 10 maths especially trigonometry bloom explains every step…"* — one mistyped as "class 1p", i.e. copies of one template.
+- The line *"I like that the explanations are simple and don't feel complicated. It saves me a lot of…"* appears **three times** across 11 and 18 Aug, once prefixed with a stray "pi".
+- A review praising the app as *"very useful for science"* — on a **maths-only** product. The template wasn't even edited to match what's being sold.
+- Four Hinglish reviews posted on 13 Aug in a single uniform register.
+- **August's star mix is 16×5★, 8×4★, 2×1★ — with no 2★ or 3★ at all.** Genuine review distributions have a middle; seeded ones don't.
+
+So Bloom's rating (3.83 from 46 ratings) is being actively propped up, and the two genuine-looking 1★ reviews in the same window are both about the ₹799 auto-debit. **Review velocity must not be used as an install proxy for Bloom in future reports.** The install counter is the only trustworthy volume metric for them.
+
+### Eduro's review curve, by contrast, looks organic
+
+4 (Mar) → 6 (Apr) → 9 (May) → 23 (Jun) → 29 (Jul) → 9 (Aug 1–18). Smooth build with a natural star spread — and a **notable August slowdown** worth watching: 9 reviews in 18 days against 29 in July is roughly a halving in pace. That may be exam-season seasonality or a genuine plateau; the next two snapshots will tell.
+
+### How growth gets measured from here
+
+```bash
+./scripts/snapshot.sh     # appends a dated row per app, prints week-over-week growth
+```
+
+Baseline is committed in `reports/metrics-history.csv`. From Monday, every weekly report opens with a measured install delta instead of an inferred one.
 
 ## Sources & data-access notes
 
