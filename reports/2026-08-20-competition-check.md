@@ -264,6 +264,84 @@ Google Ads (AW- tag) ────────────┤
 10. Whether Eduro starts replying to Play reviews (a sign they've hired ops).
 11. Bloom iOS app launch — their schema.org markup already claims "iOS, Android".
 
+---
+
+## Addendum — Meta strategy teardown (added 2026-08-20, after follow-up)
+
+A second pass tried harder to get the actual ad count, and failed for a reason worth recording precisely. What it *did* recover is a much sharper picture of how Bloom runs Meta, read directly from their shipped code.
+
+### Ad count: still not obtainable from this environment
+
+| Attempt | Result |
+|---|---|
+| `WebFetch` on Ad Library | HTTP 403 — JS bot challenge |
+| `curl` with browser UA + full `Sec-Fetch-*` / `sec-ch-ua` headers | HTTP 403 — same challenge |
+| Solving the challenge (POST `/__rd_verify_…?challenge=3`, cookie jar, 5 rounds) | Verify POST returns **302, sets no cookie**; a fresh challenge token is issued each round — never clears |
+| Headless Chromium via Playwright (installed, pointed at the on-disk browser) | Chromium cannot reach **any** host through this session's egress proxy — a control fetch of eduro.live fails identically, so this is not a Facebook-specific block |
+| Official Ad Library API (`graph.facebook.com/ads_archive`) | **Gateway policy denial** (403 to CONNECT) — not retried, per proxy policy |
+
+Note the distinction: `www.facebook.com` *does* tunnel through the proxy — the 403 is Facebook's own anti-bot challenge against a datacenter IP, not an org policy denial. **A browser on a normal residential connection gets the number in seconds.** The count of active ads, their Library IDs, start dates and impression ranges remain the one genuinely open question in this report.
+
+### Creative inventory: 21 videos, exactly
+
+Enumerated from the production bundle rather than estimated. Previous report said "16+"; the precise figure is **21 distinct video assets** on `bloomcdn.cmpntech.com`:
+
+- **16 persona solution videos** — 4 personas × 4 videos each (`Bloom Solutions - (Persona A–D) - …`)
+- **4 persona paywall videos** — `Payment Page Video - (Persona A–D) - All Boards.mp4`
+- **1 generic paywall video** — `New Payment Page Video - Final (All White).mp4`
+- Plus a non-CDN app-intro asset, `/get-app-intro.mp4`
+
+**Important caveat on interpretation:** these are *post-click funnel* videos, not Meta ad creatives. They tell you how much Bloom has invested in segmented conversion assets — which is a lot — but they are not the ads themselves and should never be quoted as an ad count.
+
+### Four funnel variants, and a live test that guts the quiz
+
+The bundle carries an experiment framework (`bloom_experiment` in localStorage, `?path=` URL parameter, `experiment_assigned` event) with **four** defined variants:
+
+| Variant | Steps | Reading |
+|---|---|---|
+| `current_landing_page` *(default)* | class → struggles → goal → goal-projection → transformations | 5 steps, aspiration-led |
+| `persona_text` | class → marks → struggles → solutions → testimonials | 5 steps, persona via text |
+| `persona_video` | same 5 steps | persona via the 16 solution videos |
+| `short_path` | **class only** | 1 step, straight to paywall |
+
+Two mechanics matter here:
+
+1. **The random rotation pool contains only two variants** — `['current_landing_page', 'short_path']` — and randomisation runs *only* on the `/onboarding-test` route. Plain `/` traffic defaults to `current_landing_page`.
+2. **All four variants are addressable by URL** (`?path=persona_video`), so ad creatives can route traffic to a specific funnel variant directly.
+
+**The strategic read:** their live A/B test is whether to **collapse the entire quiz into a single question**. `short_path` skips straight from "which class is your child in?" to the paywall. If short_path wins, the persona machinery — all 16 solution videos — becomes dead weight. The persona variants are currently *not* in the random rotation, which means that expensive creative library may already be dormant for most traffic.
+
+That materially qualifies the week-1 claim that the persona matrix is "the scaled concept". It was built for scale; it may be being tested out of existence right now. **This is the single most important thing to re-check next week.**
+
+### How they optimise Meta: a ₹9 conversion signal
+
+From `PaywallScreen-y7MolbTS.js`, the pixel fires exactly one conversion:
+
+```js
+v(`WebStartTrial`, { value: 9, currency: `INR` }, { custom: true, eventID: e })
+```
+
+Four things follow from that one line:
+
+1. **It's a custom event** (`trackCustom`), not a standard `Purchase` or `StartTrial`. No standard e-commerce event fires anywhere in the funnel.
+2. **It carries `eventID`** — the deduplication key used when the same event is sent from both browser and server. That is strong evidence they also run **Meta's Conversions API server-side**, which is a mature setup, not a beginner one.
+3. **The conversion value passed to Meta is ₹9** — parsed from `trialAmount`, not the ₹799 subscription. Meta's optimiser sees a ₹9 event.
+4. **They optimise for trial starts, not retained payers.** Nothing fires when the ₹799 charge actually collects three days later.
+
+**Why point 4 is a real weakness.** Meta's algorithm relentlessly finds the people cheapest to convert on the signal it's given. Optimising toward "starts a ₹9 trial" selects for price-sensitive, low-intent users — precisely the population most likely to cancel inside the 3-day window or demand a refund when ₹799 hits. Their own Play reviews describe exactly that outcome. Feeding back the ₹799 collection as the optimisation event, or passing true value, is the obvious fix — and until they make it, their paid funnel is structurally biased toward churn.
+
+Also confirmed in the tracking stack: Meta Pixel `890261980731916` with `PageView`, Mixpanel, GA4 `G-1RZBBRMTZ3`, Microsoft Clarity, UTM capture down to `utm_adset` and `utm_adcreative`, and funnel events `funnel_step_viewed`, `class_selected`, `phone_number_entered`, `phone_number_submitted`, `paywall_seen`, `paywall_action_clicked` (carrying `trial_amount` and `direct_amount`), `bloom_payment_done`, `get_app_seen`, `get_app_download_clicked`. Still **no `AW-` Google Ads tag** — Meta remains their only paid channel.
+
+### Eduro — re-verified today, unchanged
+
+| Page | Meta pixel | Google Ads | GA4 |
+|---|---|---|---|
+| `/` | **0 hits** | `AW-17634968559` | `G-TW33E0DLM1` |
+| `/auth` | **0 hits** | `AW-17634968559` | `G-TW33E0DLM1` |
+| `/pricing` | **0 hits** | `AW-17634968559` | `G-TW33E0DLM1` |
+
+Still no Meta presence of any kind. Bloom's pricing also re-checked and unchanged: `₹9` trial, `₹799/month` direct.
+
 ## Sources & data-access notes
 
 **Method.** Most of the high-confidence findings here come from reading the companies' own shipped production JavaScript (both sites are SPAs whose bundles contain hardcoded pricing, funnel routes, persona logic, and analytics IDs) and from the raw HTML of their Play Store listings, including Play's embedded install counter and its public reviews RPC. These are primary sources, not inferences.

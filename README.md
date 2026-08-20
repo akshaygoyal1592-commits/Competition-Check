@@ -55,11 +55,28 @@ Eduro's paid-channel status is detectable the same way — **a Meta pixel appear
 curl -s https://eduro.live/ | grep -c 'fbq(\|connect.facebook.net'   # 0 as of 2026-08-20
 ```
 
+Bloom's live funnel A/B test and creative inventory are both readable from the same bundle. The variant pool is the thing to watch — they are testing collapsing the whole quiz to one question:
+
+```bash
+curl -s https://bloomclasses.in/assets/index-DflCnpRI.js > b.js
+grep -o 'hc=\[[^]]*\]' b.js                      # variants in the random rotation
+grep -oc 'bloomcdn\.cmpntech\.com' b.js           # creative inventory size (21 distinct as of 2026-08-20)
+curl -s https://bloomclasses.in/assets/PaywallScreen-y7MolbTS.js | grep -o 'WebStartTrial[^;]*'
+# ^ their Meta conversion event: custom, value ₹9, eventID dedup (Conversions API)
+```
+
+Note the bundle hash (`index-DflCnpRI.js`) changes on each deploy — re-read it from the page source first:
+
+```bash
+curl -s https://bloomclasses.in/ | grep -o 'assets/index-[A-Za-z0-9_-]*\.js'
+```
+
 ## Known data-access limits
 
 - `facebook.com/ads/library` returns HTTP 403 with a JS bot-challenge to server-side fetches; `adstransparency.google.com` is a CAPTCHA-walled JS app. Per-ad rows (Library IDs, start dates, impression ranges) can't be scraped — reports reconstruct creative strategy from production code, social feeds, and app-store data, and flag it as inference.
 - `apps.apple.com`, `itunes.apple.com`, AppBrain, SimilarWeb, and Sensor Tower are blocked by the network egress proxy. iOS metrics and third-party install estimates are unavailable or snippet-derived.
 - Neither company publishes CAC. Every CAC figure is an estimate with its arithmetic and benchmark sources shown.
+- **Ad counts are the one thing this environment cannot get.** `www.facebook.com` tunnels fine, but Facebook serves a JS bot challenge to datacenter IPs that does not clear (the verify POST returns 302 and sets no cookie); headless Chromium can't use the session proxy at all; and `graph.facebook.com` (the official Ad Library API) is a gateway policy denial. A browser on a normal connection gets the number in seconds — hence the manual links above.
 
 ## Reports
 
