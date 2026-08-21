@@ -18,6 +18,13 @@ Weekly competitive-intelligence tracking for two Indian K-12 AI-tutoring competi
 
 Both ad libraries block server-side fetching, so these need a human with a browser. Two minutes each.
 
+**How to read the Bloom link in 60 seconds** (this is the only way to answer "which ad is scaling"):
+1. Open it — it is already sorted by total impressions, descending, so the top card is the highest-delivery ad.
+2. Read each card's **"Started running on"** date. Longevity is the signal: a creative still live after 30+ days survived optimisation and is being scaled. Anything under 7 days is a test.
+3. Note the **number of cards sharing one video** — Meta shows one card per ad, so the same creative repeated across many adsets means budget is concentrated there.
+4. Check the **landing URL** on each card: `?path=short_path` vs `?path=persona_video` reveals which funnel variant that ad feeds.
+5. Their real ads are **dark posts**, so they will not appear on the page timeline — the Ad Library is the only surface that shows them.
+
 - **Bloom — sorted by total impressions** (the "which ads are scaling" view):
   https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=IN&is_targeted_country=false&media_type=all&search_type=page&sort_data[direction]=desc&sort_data[mode]=total_impressions&view_all_page_id=1042050025664721
   Also worth checking page ID `61570708667478`, which hosts their ad-style reels.

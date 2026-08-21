@@ -418,6 +418,36 @@ So Bloom's rating (3.83 from 46 ratings) is being actively propped up, and the t
 
 Baseline is committed in `reports/metrics-history.csv`. From Monday, every weekly report opens with a measured install delta instead of an inferred one.
 
+---
+
+## Addendum 3 — CDN forensics on Bloom's creatives (added 2026-08-20)
+
+The Ad Library remains unreachable (see Addendum 1). But every creative Bloom serves sits on a public CDN, and `Last-Modified` headers date each one. That gives a creative production timeline without touching Facebook.
+
+| Uploaded | Count | Assets |
+|---|---:|---|
+| **30 Jun 2026, 16:03** | 1 | `New Payment Page Video - Final (All White).mp4` — the **generic** paywall video |
+| **31 Jul 2026, 11:58** | 16 | All persona solution videos (A–D × 4), uploaded seconds apart in one batch |
+| **31 Jul 2026, 13:56** | 4 | All persona paywall videos, one batch two hours later |
+
+**The entire persona system was shipped on a single day, 31 July — 20 days ago.** Nothing in it has been iterated since; there are no v2 files, no re-uploads.
+
+Read alongside the variant-pool finding in Addendum 1 (`persona_text` and `persona_video` are defined but **not** in the random rotation), the conclusion is:
+
+> **Bloom's persona machinery is a three-week-old experiment that is not yet live in the traffic split.** The generic all-white paywall video from 30 June — 51 days old and still the funnel default — is the only creative in their stack with real longevity. In funnel terms, that generic video is the workhorse; the 20 persona assets are an unlaunched bet.
+
+This materially tempers the week-1 framing of the persona matrix as their "scaled concept". It is their *intended* scaled concept, built but not yet deployed.
+
+### Why their Facebook page looks dead
+
+The page's visible posts carry near-zero engagement — the 12 Jun post ("AI Maths classes, created by IIT teachers, only on Bloom! Take a trial now") has **2 reactions**, with an "Install now" CTA to the Play Store and a creative captioned "Improve Your Maths Marks!".
+
+That is not evidence of low spend. It is evidence they run **dark posts** — unpublished page posts used purely as ads, which never appear on the page timeline and are visible only inside the Ad Library. Standard practice for a performance advertiser, and the reason page-timeline analysis cannot answer "which ad is scaling" for this company.
+
+### Standing answer to "which ad is scaling?"
+
+**Not obtainable from this environment, and not obtainable from their public page either.** It requires the Ad Library in a browser. The 60-second procedure is in the README. Everything else in this report about their creative strategy is funnel-side inference, correctly labelled as such.
+
 ## Sources & data-access notes
 
 **Method.** Most of the high-confidence findings here come from reading the companies' own shipped production JavaScript (both sites are SPAs whose bundles contain hardcoded pricing, funnel routes, persona logic, and analytics IDs) and from the raw HTML of their Play Store listings, including Play's embedded install counter and its public reviews RPC. These are primary sources, not inferences.
